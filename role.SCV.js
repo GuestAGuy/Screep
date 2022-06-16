@@ -5,13 +5,13 @@ var roleSCV = {
 
     run: function (creep) {
         var nums = creep.memory.num;
-        if (creep.memory.working && creep.store.energy == 0) {
-            creep.say('🔄 harvest');
+        if (creep.store.energy == 0) {
+            // creep.say('🔄 harvest');
             creep.memory.working = false;
             creep.memory.task = 0;
         }
         if (!creep.memory.working && creep.store.getFreeCapacity(RESOURCE_ENERGY) == 0) {
-            creep.say('working');
+            // creep.say('working');
             creep.memory.working = true;
             creep.memory.task = 0;
         }
@@ -29,14 +29,7 @@ var roleSCV = {
                     creep.memory.task = 2;
                 }
                 if(targets.length == 0) {
-                    creep.memory.task = 0;
-                }
-            }
-
-
-            if(creep.memory.task == 0){
-                if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(creep.room.controller);
+                    creep.memory.task = 3;
                 }
             }
             else if(creep.memory.task == 1) {
@@ -66,6 +59,11 @@ var roleSCV = {
                 }
                 if (creep.build(targets[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(targets[0]);
+                }
+            }
+            else if(creep.memory.task == 3){
+                if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(creep.room.controller);
                 }
             }
         } else { //if empty
