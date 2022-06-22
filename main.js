@@ -1,59 +1,41 @@
-var roleHarvester = require('role.harvester');
-var roleUpgrader = require('role.upgrader');
-var roleRepairer = require('role.repairer');
-var roleSCV = require('role.SCV');
+// import modules
+require('prototype.creep');
+require('prototype.tower');
+require('prototype.spawn');
 
-module.exports.loop = function () {
-
-    for(var name in Memory.creeps) {
-        if(!Game.creeps[name]) {
+module.exports.loop = function() {
+    // check for memory entries of died creeps by iterating over Memory.creeps
+    for (let name in Memory.creeps) {
+        // and checking if the creep is still alive
+        if (Game.creeps[name] == undefined) {
+            // if not, delete the memory entry
             delete Memory.creeps[name];
-            console.log('Clearing non-existing creep memory:', name);
         }
+    }
+    // console.log(Game.cpu.bucket);
+    if(Game.cpu.bucket == 10000){
+        Game.cpu.generatePixel()
+    }
+    // for each creeps
+    for (let name in Game.creeps) {
+        // run creep logic
+        Game.creeps[name].runRole();
     }
 
-    var SCVs = _.filter(Game.creeps, (creep) => creep.memory.role == 'SCV');
-    var Upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
-    var repairers = _.filter(Game.creeps, (creep) => creep.memory.role == 'repairer');
-    //console.log('Harvesters: ' + harvesters.length);
-
-    if(SCVs.length < 6) {
-        var newName = 'SCV-' + Game.time%100;
-        var ran = Game.time%2;
-        console.log('Spawning new SCV: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE], newName,{memory: {role: 'SCV', working: false, task: 0, num: 1}});
+    // find all towers
+    var towers = _.filter(Game.structures, s => s.structureType == STRUCTURE_TOWER);
+    // for each tower
+    for (let tower of towers) {
+        // run tower logic
+        tower.defend();
     }
-    else if(Upgraders.length <4){
-        var newName = 'Upgrader' + Game.time%100;
-        console.log('Spawning new upgraders: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE,MOVE], newName,{memory: {role: 'upgrader'}});
+    
+    // for each spawn
+    for (let spawnName in Game.spawns) {
+        // run spawn logic
+        Game.spawns[spawnName].spawnCreepsIfNecessary();
     }
-    else if(repairers.length<1){
-        var newName = 'repairer' + Game.time%100;
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,MOVE], newName,{memory: {role: 'repairer'}});
-    }
-    if(Game.spawns['Spawn1'].spawning) { 
-        var spawningCreep = Game.creeps[Game.spawns['Spawn1'].spawning.name];
-        Game.spawns['Spawn1'].room.visual.text(
-            '🛠️ Building ' + spawningCreep.memory.role,
-            Game.spawns['Spawn1'].pos.x + 1, 
-            Game.spawns['Spawn1'].pos.y, 
-            {align: 'left', opacity: 0.8});
-    }
-
-    for(var name in Game.creeps) {
-        var creep = Game.creeps[name];
-        if(creep.memory.role == 'harvester') {
-            roleHarvester.run(creep);
-        }
-        if(creep.memory.role == 'upgrader') {
-            roleUpgrader.run(creep);
-        }
-        if(creep.memory.role == 'SCV') {
-            roleSCV.run(creep);
-        }
-        if(creep.memory.role == 'repairer'){
-            roleRepairer.run(creep);
-        }
-    }
-}
+    let linkFrom = Game.getObjectById('62aeeec5fe95153f8fe437ae');
+    let linkTo = Game.getObjectById('62aed97466494ed3474f6b55');
+    linkFrom.transferEnergy(linkTo);
+};
