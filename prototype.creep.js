@@ -7,9 +7,7 @@ var roles = {
     longDistanceHarvester: require('role.longDistanceHarvester'),
     claimer: require('role.claimer'),
     MULE: require('role.MULE'),
-    Hercules: require('role.Hercules'),
-    Marine: require('role.marine'),
-    Marauder: require('role.marauder')
+    Hercules: require('role.Hercules')
 };
 
 Creep.prototype.runRole =
@@ -28,9 +26,8 @@ Creep.prototype.getEnergy =
         if (useContainer) {
             // find closest container
             container = this.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: s => ((s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_LINK)
-                    && s.store[RESOURCE_ENERGY] > 200) 
-                || (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 2000)
+                filter: s => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0) 
+                //|| (s.structureType == STRUCTURE_STORAGE && s.store[RESOURCE_ENERGY] > 2000)
             });
             // if one was found
             if (container != undefined) {

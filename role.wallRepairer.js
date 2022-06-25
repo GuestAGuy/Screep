@@ -20,7 +20,6 @@ module.exports = {
             // find all walls in the room
             var walls = creep.room.find(FIND_STRUCTURES, {
                 filter: (s) => s.structureType == STRUCTURE_WALL
-                            || s.structureType == STRUCTURE_RAMPART
             });
 
             var target = undefined;

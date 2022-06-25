@@ -24,7 +24,6 @@ module.exports = {
                     // we use the arrow operator to define it
                     filter: (s) => (s.structureType == STRUCTURE_SPAWN
                                  //|| s.structureType == STRUCTURE_EXTENSION
-                                 || s.structureType == STRUCTURE_LINK
                                  || s.structureType == STRUCTURE_TOWER)
                                  && s.energy < s.energyCapacity
                 });
@@ -55,16 +54,6 @@ module.exports = {
             // if in target room
             if (creep.room.name == creep.memory.target) {
                 // find source
-                // let targetStructure = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
-                // if(targetStructure != undefined){
-                //     creep.moveTo(targetStructure);
-                //     if(creep.attack(targetStructure) == ERR_NOT_IN_RANGE){
-                //         creep.moveTo(targetStructure);
-                //     }
-                // }
-
-                
-                
                 var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
                 var dropSource = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
                 if (creep.pickup(dropSource) == ERR_NOT_IN_RANGE) {
@@ -77,8 +66,6 @@ module.exports = {
                         creep.moveTo(source);
                     }
                 }
-                
-                
             }
             // if not in target room
             else {

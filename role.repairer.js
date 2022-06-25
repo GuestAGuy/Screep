@@ -1,4 +1,4 @@
-var roleSCV = require('role.SCV');
+var roleBuilder = require('role.SCV');
 
 module.exports = {
     // a function to run the logic for this role
@@ -38,7 +38,7 @@ module.exports = {
             // if we can't fine one
             else {
                 // look for construction sites
-                roleSCV.run(creep);
+                roleBuilder.run(creep);
             }
         }
             // if creep is supposed to get energy

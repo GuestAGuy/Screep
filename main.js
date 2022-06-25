@@ -12,10 +12,7 @@ module.exports.loop = function() {
             delete Memory.creeps[name];
         }
     }
-    // console.log(Game.cpu.bucket);
-    if(Game.cpu.bucket == 10000){
-        Game.cpu.generatePixel()
-    }
+
     // for each creeps
     for (let name in Game.creeps) {
         // run creep logic
@@ -29,13 +26,10 @@ module.exports.loop = function() {
         // run tower logic
         tower.defend();
     }
-    
+
     // for each spawn
     for (let spawnName in Game.spawns) {
         // run spawn logic
         Game.spawns[spawnName].spawnCreepsIfNecessary();
     }
-    let linkFrom = Game.getObjectById('62aeeec5fe95153f8fe437ae');
-    let linkTo = Game.getObjectById('62aed97466494ed3474f6b55');
-    linkFrom.transferEnergy(linkTo);
 };

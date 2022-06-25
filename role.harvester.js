@@ -1,15 +1,14 @@
-var roleRepairer = require('role.repairer');
 module.exports = {
     // a function to run the logic for this role
     /** @param {Creep} creep */
     run: function(creep) {
         // if creep is bringing energy to a structure but has no energy left
-        if ( creep.carry.energy == 0) {
+        if (creep.memory.working == true && creep.carry.energy == 0) {
             // switch state
             creep.memory.working = false;
         }
         // if creep is harvesting energy but is full
-        else if (creep.carry.energy == creep.carryCapacity) {
+        else if (creep.memory.working == false && creep.carry.energy == creep.carryCapacity) {
             // switch state
             creep.memory.working = true;
         }
@@ -38,9 +37,6 @@ module.exports = {
                     // move towards it
                     creep.moveTo(structure);
                 }
-            }
-            else{
-                roleRepairer.run(creep);
             }
         }
         // if creep is supposed to harvest energy from source

@@ -74,14 +74,11 @@ StructureSpawn.prototype.spawnCreepsIfNecessary =
                 // if no claim order was found, check other roles
                 else if (numberOfCreeps[role] < this.memory.minCreeps[role]) {
                     if (role == 'Hercules') {
-                        name = this.createHercules(600);
+                        name = this.createHercules(300);
                     }
                     else if(role == 'repairer'){
                         name = this.createCustomCreep(400,role);
                     }
-                    // else if(role == 'Marine'){
-                    //     name = this.createMarine(maxEnergy);
-                    // }
                     else {
                         name = this.createCustomCreep(maxEnergy, role);
                     }
@@ -100,19 +97,8 @@ StructureSpawn.prototype.spawnCreepsIfNecessary =
                     c.memory.role == 'longDistanceHarvester' && c.memory.target == roomName)
 
                 if (numberOfLongDistanceHarvesters[roomName] < this.memory.minLongDistanceHarvesters[roomName]) {
-                    name = this.createLongDistanceHarvester(maxEnergy, 4, room.name, roomName);
+                    name = this.createLongDistanceHarvester(maxEnergy, 3, room.name, roomName, 1);
                 }
-            }
-        }
-
-        let numberOfLongDistanceSCV = {};
-        if(name == undefined){
-            for (let roomName in this.memory.minLongDistanceSCV) {
-                numberOfLongDistanceSCV[roomName] = _.sum(Game.creeps, (c) =>
-                c.memory.role == 'SCV' && c.memory.target == roomName)
-
-            if (numberOfLongDistanceSCV[roomName] < this.memory.minLongDistanceSCV[roomName]) {
-                name = this.createLongDistanceSCV(maxEnergy,  room.name, roomName);
             }
         }
 
@@ -127,7 +113,7 @@ StructureSpawn.prototype.spawnCreepsIfNecessary =
             }
         }
     };
-}
+
 // create a new function for StructureSpawn
 StructureSpawn.prototype.createCustomCreep =
     function (energy, roleName) {
@@ -148,12 +134,12 @@ StructureSpawn.prototype.createCustomCreep =
         }
         var newName = 'SCV-' + Game.time%100;
         // create creep with the created body and the given role
-        return this.spawnCreep(body, newName, { memory:{role: roleName, working: false }});
+        return this.createCreep(body, newName, { role: roleName, working: false });
     };
 
 // create a new function for StructureSpawn
 StructureSpawn.prototype.createLongDistanceHarvester =
-    function (energy, numberOfWorkParts, home, target) {
+    function (energy, numberOfWorkParts, home, target, sourceIndex) {
         // create a body with the specified number of WORK parts and one MOVE part per non-MOVE part
         var body = [];
         for (let i = 0; i < numberOfWorkParts; i++) {
@@ -162,7 +148,6 @@ StructureSpawn.prototype.createLongDistanceHarvester =
 
         // 150 = 100 (cost of WORK) + 50 (cost of MOVE)
         energy -= 150 * numberOfWorkParts;
-        // energy -= 130;   //unsafe area use this
 
         var numberOfParts = Math.floor(energy / 100);
         // make sure the creep is not too big (more than 50 parts)
@@ -173,29 +158,29 @@ StructureSpawn.prototype.createLongDistanceHarvester =
         for (let i = 0; i < numberOfParts + numberOfWorkParts; i++) {
             body.push(MOVE);
         }
-        // body.push(ATTACK);
-        // body.push(MOVE);
         var newName = 'Reaper-' + Game.time%100;
         // create creep with the created body
-        return this.spawnCreep(body, newName, {memory:{
+        return this.createCreep(body, newName, {
             role: 'longDistanceHarvester',
             home: home,
             target: target,
+            sourceIndex: sourceIndex,
             working: false
-        }});
+        });
     };
 
 // create a new function for StructureSpawn
 StructureSpawn.prototype.createClaimer =
     function (target) {
-        return this.spawnCreep([CLAIM, MOVE], undefined, {memory:{ role: 'claimer', target: target }});
+        return this.createCreep([CLAIM, MOVE], undefined, { role: 'claimer', target: target });
     };
 
 // create a new function for StructureSpawn
 StructureSpawn.prototype.createMULE =
     function (sourceId) {
         var newName = 'MULE-' + Game.time%100;
-        return this.spawnCreep([WORK, WORK, WORK, WORK, WORK, MOVE], newName,{memory:{ role: 'MULE', sourceId: sourceId }});
+        return this.createCreep([WORK, WORK, WORK, WORK, WORK, MOVE], newName,
+                                { role: 'MULE', sourceId: sourceId });
     };
 
 // create a new function for StructureSpawn
@@ -214,54 +199,5 @@ StructureSpawn.prototype.createHercules =
         }
         var newName = 'Hercules-' + Game.time%100;
         // create creep with the created body and the role 'Hercules'
-        return this.spawnCreep(body, newName, { memory:{role: 'Hercules', working: false }});
+        return this.createCreep(body, newName, { role: 'Hercules', working: false });
     };
-
-StructureSpawn.prototype.createMarine = 
-    function(energy){
-        energy -= 600;
-        let numberOfParts = Math.floor(energy/200);
-        let body = [];
-        for(let i = 0; i < 5; i++){
-            body.push(TOUGH);
-            body.push(MOVE);
-        }
-        for(let i = 0; i < numberOfParts; i++){
-            body.push(RANGED_ATTACK);
-            body.push(MOVE);
-        }
-        body.push(MOVE);
-        body.push(HEAL);
-        let newName = 'Marine-' + Game.time%100;
-        return this.spawnCreep(body, newName, {memory:{
-            role: 'Marine',
-            home: "E8S54",
-            target: "E8S55",
-        }});
-    }
-
-StructureSpawn.prototype.createLongDistanceSCV =
-    function (energy, home, target) {
-        // create a balanced body as big as possible with the given energy
-        var numberOfParts = Math.floor(energy / 200);
-        // make sure the creep is not too big (more than 50 parts)
-        numberOfParts = Math.min(numberOfParts, Math.floor(50 / 3));
-        var body = [];
-        for (let i = 0; i < numberOfParts; i++) {
-            body.push(WORK);
-        }
-        for (let i = 0; i < numberOfParts; i++) {
-            body.push(CARRY);
-        }
-        for (let i = 0; i < numberOfParts; i++) {
-            body.push(MOVE);
-        }
-        var newName = 'SCV-' + Game.time%100;
-        // create creep with the created body and the given role
-        return this.spawnCreep(body, newName, {memory:{
-            role: 'SCV',
-            home: home,
-            target: target,
-            working: false
-        }});
-    };    
